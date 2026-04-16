@@ -1,34 +1,30 @@
+import threading
+import time
 import streamlit as st
-from werkzeug.middleware.dispatcher import DispatcherMiddleware
-from werkzeug.serving import run_simple
-from threading import Thread
-from app import app as flask_app
+import streamlit.components.v1 as components
 
 st.set_page_config(page_title="DHI Invoice OCR Tool", layout="wide")
+
 st.title("DHI Invoice OCR Tool")
+st.subheader("Invoice OCR Interface")
 
-# Create a combined WSGI application
-def run_combined_app():
-    combined_app = DispatcherMiddleware(
-        lambda environ, start_response: start_response(
-            "200 OK", [("Content-Type", "text/plain")]
-        ),
-        {
-            "/flask": flask_app,
-        },
-    )
-    run_simple("0.0.0.0", 5000, combined_app, use_reloader=False)
+# Function to run Flask app
+def run_flask():
+    from app import app
+    app.run(host="0.0.0.0", port=5000, debug=False, use_reloader=False)
 
-# Start Flask in a background thread
+# Start Flask only once
 if "flask_started" not in st.session_state:
-    thread = Thread(target=run_combined_app, daemon=True)
+    thread = threading.Thread(target=run_flask, daemon=True)
     thread.start()
     st.session_state.flask_started = True
+    time.sleep(3)  # Give Flask time to start
 
-# Embed the Flask app
-st.markdown("### Invoice OCR Interface")
-st.components.v1.iframe(
-    src="/flask",
+st.success("Flask server is running.")
+
+# Embed Flask UI
+components.iframe(
+    src="http://localhost:5000",
     height=900,
     scrolling=True
 )
