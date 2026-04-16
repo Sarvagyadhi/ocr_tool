@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DHI - InvoiceLens</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--navy:#0D1B2A;--ink:#1E3A5F;--teal:#00B4D8;--cyan:#90E0EF;--cream:#F8F5F0;--gold:#F4A261;--green:#2EC4B6;--red:#E63946;--muted:#6B7C93;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--navy);min-height:100vh;color:var(--cream);overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,180,216,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,180,216,.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+
+.wrapper{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:48px 24px 80px;}
+.header{text-align:center;margin-bottom:52px;}
+.logo-row{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:12px;}
+h1{font-family:'Syne',sans-serif;font-size:2.8rem;font-weight:800;letter-spacing:-1px;color:#fff;}
+.tagline{color:var(--muted);font-size:.95rem;margin-top:6px;}
+
+.card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:32px;margin-bottom:20px;backdrop-filter:blur(12px);}
+.section-label{font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+.section-label::after{content:'';flex:1;height:1px;background:rgba(0,180,216,.2);}
+
+.dropzone{border:1px dashed rgba(0,180,216,.3);border-radius:16px;padding:52px 24px;text-align:center;cursor:pointer;transition:all .3s;position:relative;background:rgba(0,180,216,.02);}
+.dropzone:hover{border-color:var(--teal);background:rgba(0,180,216,.05);}
+.dropzone input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+.drop-icon{font-size:3rem;margin-bottom:14px;display:block;}
+.drop-text{font-size:1.05rem;color:#fff;font-weight:500;}
+.drop-sub{font-size:.83rem;color:var(--muted);margin-top:6px;}
+
+.pill-row{display:flex;gap:8px;justify-content:center;margin-top:18px;}
+.pill{font-family:'DM Mono',monospace;font-size:.65rem;padding:4px 10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;color:var(--cyan);text-transform:uppercase;}
+
+.col-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:12px;margin-top:4px;}
+.col-toggle{display:flex;align-items:center;gap:12px;padding:16px 20px;border:1px solid rgba(255,255,255,.1);border-radius:12px;cursor:pointer;background:rgba(255,255,255,.02);transition:all .2s;}
+.col-toggle:hover{border-color:var(--teal);background:rgba(0,180,216,.05);}
+.col-toggle.active{border-color:var(--teal);background:rgba(0,180,216,.1);}
+.col-toggle input{display:none;}
+.checkmark{width:20px;height:20px;border:2px solid var(--muted);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.7rem;}
+.col-toggle.active .checkmark{background:var(--teal);border-color:var(--teal);color:#fff;}
+.col-name{font-size:.9rem;font-weight:500;color:#ddd;}
+
+.run-btn{width:100%;padding:18px;background:var(--teal);border:none;border-radius:14px;font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;color:var(--navy);cursor:pointer;transition:all .3s;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:10px;}
+.run-btn:hover:not(:disabled){transform:translateY(-2px);filter:brightness(1.1);}
+.run-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+.progress-section{display:none; margin-top: 20px;}
+.progress-bar-wrap{background:rgba(255,255,255,.05);border-radius:100px;height:6px;overflow:hidden;margin:12px 0;}
+.progress-bar{height:100%;background:var(--teal);width:0;transition:width .3s;}
+
+.results-section{display:none;margin-top:30px;}
+.res-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.dl-btn{padding:8px 16px;border-radius:8px;font-size:.8rem;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--teal);color:var(--teal);transition:all .2s;}
+.dl-btn:hover{background:rgba(0,180,216,.1);}
+
+.table-wrap{overflow-x:auto;border:1px solid rgba(255,255,255,.07);border-radius:12px;background:rgba(0,0,0,.1);}
+table{width:100%;border-collapse:collapse;font-size:.85rem;}
+th{font-family:'Syne',sans-serif;font-size:.65rem;text-transform:uppercase;letter-spacing:1px;color:var(--teal);padding:14px;text-align:left;background:rgba(255,255,255,.02);}
+td{padding:12px 14px;border-top:1px solid rgba(255,255,255,.05);color:#ccc;}
+.conf-tag{font-family:'DM Mono',monospace;font-weight:bold;font-size:.75rem;}
+
+.loader{width:18px;height:18px;border:2px solid rgba(0,0,0,.2);border-top-color:var(--navy);border-radius:50%;animation:spin .8s linear infinite;display:none;}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div class="header">
+        <div class="logo-row"><h1>DHI</h1></div>
+        <p class="tagline">Extract Invoice No. · Date · Cost · Location from document sets</p>
+    </div>
+
+    <div class="card">
+        <div class="section-label">01 &nbsp; Upload Documents</div>
+        <div class="dropzone" id="dropzone">
+            <input type="file" id="fileInput" multiple/>
+            <span class="drop-icon">📂</span>
+            <div class="drop-text">Drop files here or click to browse</div>
+            <div class="drop-sub">Batch upload supported — process thousands at once</div>
+            <div class="pill-row">
+                <span class="pill">PDF</span><span class="pill">DOCX</span><span class="pill">XLSX</span><span class="pill">IMG</span>
+            </div>
+        </div>
+        <div id="fileList" style="margin-top:15px; font-size: 0.8rem; color: var(--muted);"></div>
+    </div>
+
+    <div class="card">
+        <div class="section-label">02 &nbsp; Select Columns to Export</div>
+        <div class="col-grid">
+            <label class="col-toggle active"><input type="checkbox" value="Invoice No." checked/><div class="checkmark">✓</div><span class="col-name">Invoice No.</span></label>
+            <label class="col-toggle active"><input type="checkbox" value="Invoice Date" checked/><div class="checkmark">✓</div><span class="col-name">Invoice Date</span></label>
+            <label class="col-toggle active"><input type="checkbox" value="Quantity" checked/><div class="checkmark">✓</div><span class="col-name">Quantity / Units</span></label>
+            <label class="col-toggle active"><input type="checkbox" value="Cost" checked/><div class="checkmark">✓</div><span class="col-name">Total Cost</span></label>
+        </div>
+    </div>
+
+    <button class="run-btn" id="runBtn" disabled>
+        <div class="loader" id="loader"></div>
+        <span>Extract &amp; Export to Excel</span>
+    </button>
+
+    <div class="progress-section" id="progressSection">
+        <div style="display:flex; justify-content:space-between; font-size:.8rem; color:var(--teal);">
+            <span id="progLabel">Processing...</span>
+            <span id="progPct">0%</span>
+        </div>
+        <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar"></div></div>
+    </div>
+
+    <div class="results-section" id="resultsSection" class="card">
+        <div class="res-head">
+            <h3 style="font-family:'Syne';">Extracted Results</h3>
+            <div style="display:flex; gap:8px;">
+                <a href="#" class="dl-btn" id="dlP">⬇ Preview</a>
+                <a href="#" class="dl-btn" id="dlE" style="border-color:var(--gold); color:var(--gold);">⬇ Envizi</a>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>File</th>
+                        <th>Invoice No</th>
+                        <th>Date</th>
+                        <th>Quantity / Units</th>
+                        <th>Total Cost</th>
+                        <th>Confidence</th>
+                    </tr>
+                </thead>
+                <tbody id="resBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+const API = window.location.origin;
+let files = [];
+
+const fileInput = document.getElementById('fileInput');
+fileInput.addEventListener('change', e => { files = [...files, ...Array.from(e.target.files)]; renderFiles(); });
+
+function renderFiles() {
+    document.getElementById('fileList').textContent = files.length ? `${files.length} file(s) selected` : '';
+    document.getElementById('runBtn').disabled = files.length === 0;
+}
+
+document.querySelectorAll('.col-toggle').forEach(el => {
+    el.addEventListener('click', () => {
+        const cb = el.querySelector('input');
+        cb.checked = !cb.checked;
+        el.classList.toggle('active', cb.checked);
+        el.querySelector('.checkmark').textContent = cb.checked ? '✓' : '';
+    });
+});
+
+document.getElementById('runBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('runBtn');
+    const loader = document.getElementById('loader');
+    const progSec = document.getElementById('progressSection');
+    const bar = document.getElementById('progressBar');
+    
+    btn.disabled = true;
+    loader.style.display = 'block';
+    progSec.style.display = 'block';
+    
+    const fd = new FormData();
+    files.forEach(f => fd.append('files', f));
+    [...document.querySelectorAll('.col-toggle.active input')].forEach(c => fd.append('columns', c.value));
+
+    try {
+        bar.style.width = '30%';
+        const res = await fetch(`${API}/extract`, { method: 'POST', body: fd });
+        bar.style.width = '70%';
+        const data = await res.json();
+        
+        const body = document.getElementById('resBody');
+        body.innerHTML = '';
+        data.records.forEach(r => {
+            const tr = document.createElement('tr');
+            const conf = parseInt(r['Confidence Score'] || 0);
+            const color = conf > 80 ? 'var(--green)' : conf > 50 ? 'var(--gold)' : 'var(--red)';
+            
+            tr.innerHTML = `
+                <td style="font-size:.7rem; color:var(--muted)">${r.filename}</td>
+                <td style="font-family:'DM Mono'; color:var(--cyan)">${r['Invoice No.'] || '—'}</td>
+                <td>${r['Invoice Date'] || '—'}</td>
+                <td style="color:var(--cyan)">${r['Quantity'] || '—'}</td>
+                <td style="color:var(--teal); font-weight:600">${r['Cost'] || '—'}</td>
+                <td><span class="conf-tag" style="color:${color}">${r['Confidence Score']}</span></td>
+            `;
+            body.appendChild(tr);
+        });
+
+        document.getElementById('dlP').href = `${API}/download/${data.excel_id}`;
+        document.getElementById('dlE').href = `${API}/download/${data.template_id}`;
+        document.getElementById('resultsSection').style.display = 'block';
+        bar.style.width = '100%';
+    } catch(err) {
+        alert('Extraction failed');
+    } finally {
+        btn.disabled = false;
+        loader.style.display = 'none';
+    }
+});
+</script>
+
+</body>
+</html>
