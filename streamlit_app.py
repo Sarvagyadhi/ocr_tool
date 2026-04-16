@@ -5,12 +5,20 @@ import streamlit.components.v1 as components
 # Start Flask in a background thread
 def run_flask():
     from app import app
-    app.run(port=5000)
+    app.run(host="0.0.0.0", port=5000, debug=False)
 
 thread = threading.Thread(target=run_flask, daemon=True)
 thread.start()
 
-st.set_page_config(page_title="DHI - InvoiceLens", layout="wide")
-st.markdown("<style>iframe{border:none;}</style>", unsafe_allow_html=True)
+st.set_page_config(
+    page_title="DHI - InvoiceOCR",
+    layout="wide"
+)
 
-components.iframe("http://localhost:5000", height=900, scrolling=True)
+st.title("DHI Invoice OCR Tool")
+
+components.iframe(
+    "http://localhost:5000",
+    height=900,
+    scrolling=True
+)
