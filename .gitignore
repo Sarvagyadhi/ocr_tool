@@ -1,7 +1,9 @@
 __pycache__/
 *.pyc
-uploads_temp/
-outputs/
-scratch/
+*.pyo
+*.pyd
+*.log
+*.sqlite3
 .env
-*.xlsx
+uploads_temp/*
+outputs/*
